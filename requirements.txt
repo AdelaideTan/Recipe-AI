@@ -1,4 +1,5 @@
 fastapi
 uvicorn
 requests
-beautifulsoup4
+beautifulsoup4 #用來把抓下來的 HTML 變成 易於操作的結構化資料
+lxml #套件，快速解析 HTML/XML
