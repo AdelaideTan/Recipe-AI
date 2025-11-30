@@ -114,3 +114,4 @@ def search_recipes(query: str, limit=3):
             break
 
     return results
+
