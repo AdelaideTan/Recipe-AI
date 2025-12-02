@@ -1,5 +1,9 @@
-fastapi
-uvicorn
-requests
-beautifulsoup4 #用來把抓下來的 HTML 變成 易於操作的結構化資料
-lxml #套件，快速解析 HTML/XML
+#requirements.txt
+# 所需的函式庫（Library）清單
+
+fastapi         #Web 框架-建立後端 API 服務 的核心框架
+uvicorn         #啟動和運行你的 fastapi 應用程式的高性能伺服器。它讓你的 API 能夠在 Railway 等部署平台上對外提供服務
+requests        #用於向食譜網站發送 HTTP 請求，抓取網頁的原始 HTML 內容
+beautifulsoup4  #用來把抓下來的 HTML 變成 易於操作的結構化資料
+lxml            #套件，快速解析 HTML/XML
+pydantic
