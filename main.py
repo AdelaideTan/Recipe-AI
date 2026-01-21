@@ -11,8 +11,8 @@ import os
 import uvicorn
 import time 
 
-from scraper import search_recipes      # 引入爬蟲模組（負責抓取資料）
-from parser import clean_recipe         # 引入資料清洗模組（負責標準化結構）
+from scraper import search_recipes, fetch_steps  # 確保 scraper 有匯出 fetch_steps      # 引入爬蟲模組（負責抓取資料）
+from parser import clean_recipe                                                       # 引入資料清洗模組（負責標準化結構）
 
 app = FastAPI()
 
@@ -26,6 +26,18 @@ CACHE_TTL_SECONDS = 3600        # 快取有效期設定為 1 小時 (可調整)
 # Pydantic 模型用於第二次 POST 請求的輸入
 class URLPayload(BaseModel):    
     recipe_url: str             # 定義 POST 請求 Body 必須包含 recipe_url 欄位
+
+
+# ----------------------------------------------------
+# 路由 0: GET /health (方案一：喚醒專用節點)
+# ----------------------------------------------------
+@app.get("/health")
+def health_check():
+    """
+    用於被外部 cron-job 呼叫，防止 Render 進入休眠。
+    """
+    return {"status": "ok", "timestamp": time.time(), "cache_count": len(RECIPE_CACHE)}
+
 
 # ----------------------------------------------------
 # 路由 1: GET /recipes (第一次搜尋並快取 - 回傳完整資料)
@@ -77,29 +89,35 @@ def get_full_details(payload: URLPayload):
     # 1. 檢查快取
     cached_item = RECIPE_CACHE.get(url)             # 嘗試使用 URL 從字典中查找數據
 
-    if cached_item:
-        # 檢查快取是否過期 (可選)
-        # if time.time() - cached_item["timestamp"] > CACHE_TTL_SECONDS:
-        #     del RECIPE_CACHE[url]
-        #     raise HTTPException(status_code=404, detail=f"Recipe details have expired.")
+    if not cached_item:
+        try:
+            # 呼叫 scraper 的 fetch_steps 現場抓取
+            print(f"快取失效，嘗試現場重爬: {url}")
+            steps = fetch_steps(url)
+            if not steps:
+                raise Exception("無法爬取步驟")
+            
+            # 建立一個臨時的標準格式
+            recovery_data = {
+                "title": "食譜詳情(重新載入)",
+                "original_url": url,
+                "steps_raw": [{"description": s.get("description", ""), "image": s.get("image", "")} for s in steps]
+            }
+            return Response(content=json.dumps(jsonable_encoder(recovery_data)), media_type="application/json")
+        except Exception as e:
+            raise HTTPException(status_code=404, detail=f"快取已失效且補爬失敗: {str(e)}")
 
-        # 2. 從快取中直接取出完整的食譜資料
-        full_recipe_data = cached_item["data"] 
-        
-        # 3. 回傳這份包含所有細節 (title, image, ingredients, steps) 的資料給 n8n
-        formatted = json.dumps(
-            jsonable_encoder(full_recipe_data),
-            ensure_ascii=False,
-            indent=4
-        )
-        return Response(content=formatted, media_type="application/json")
-        
-    # 如果快取中找不到
-    raise HTTPException(                             # 找不到則回傳 404 錯誤
-        status_code=404, detail=f"Recipe details for {url} not found in cache.")
+    full_recipe_data = cached_item["data"] 
+    formatted = json.dumps(
+        jsonable_encoder(full_recipe_data),
+        ensure_ascii=False,
+        indent=4
+    )
+    return Response(content=formatted, media_type="application/json")
 
 
-# 🔥 Railway(雲端部署平台) 必要的啟動入口
+# 🔥 Render(雲端部署平台) 必要的啟動入口
 if __name__ == "__main__":
+    # Render 會自動提供 PORT 環境變數
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)     # 使用 Uvicorn 啟動 FastAPI 服務
