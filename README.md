@@ -29,7 +29,7 @@ source venv/bin/activate
 # 安裝套件
 pip install -r requirements.txt
 
-2. 設定環境變數
+### 2. 設定環境變數
 在根目錄建立 .env 檔案，並填入以下資訊：
 
 LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_Token
@@ -37,7 +37,7 @@ LINE_CHANNEL_SECRET=你的_LINE_Secret
 GEMINI_API_KEY=你的_Gemini_Key
 PORT=8000
 
-3. 啟動服務
+### 3. 啟動服務
 python main.py
 
 🌐 部署至 Render 說明
@@ -52,7 +52,7 @@ Environment Variables:
 
 Health Check: 本專案提供 /health 端點，可用於監控服務狀態。
 
-📝 API 說明
+## 📝 API 說明
 GET /recipes?q={食材}: 初次搜尋並將完整食譜存入快取。
 
 POST /recipe_details: 根據食譜 URL 從快取提取詳細步驟。
