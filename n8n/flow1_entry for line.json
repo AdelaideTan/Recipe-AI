@@ -1,0 +1,650 @@
+{
+  "name": "AI Recipe 烹飪小助手 Flow 1 for line",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aed513e4-2f8e-4ff8-b254-dbfa1f127a4d",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "MATCH",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        384
+      ],
+      "id": "f9135078-45c6-4f57-a4cd-aa8a0fe304ec",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "flow 2",
+        "height": 208,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        496,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "df11f240-0769-4fcb-baf0-a274c8c218c9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-recipe-entry",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -736,
+        160
+      ],
+      "id": "980e80d2-a45a-456c-9bc3-c98b0dc46fc7",
+      "name": "Webhook",
+      "webhookId": "c53fe99d-d322-492b-a0b8-aa49d0eb6172"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JS 版本 (功能與你的 Python 完全一致)\nconst items = $input.all();\nconst input_data = items[0].json.body || {};\nconst events = input_data.events || [];\nlet output = [];\n\nif (events.length > 0) {\n    const event = events[0];\n    output.push({\n        json: {\n            replyToken: event.replyToken,\n            user_input: event.message?.type === \"text\" ? event.message.text : \"\",\n            event_data: event.postback?.data || \"\",\n            messageType: event.type\n        }\n    });\n}\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        160
+      ],
+      "id": "e286ce9d-84b4-4d85-88c6-23a83fc27c62",
+      "name": "Code in Python (Beta)2",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1056,
+        80
+      ],
+      "id": "48e6077c-40ef-46c1-923e-1bede3d88041",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4b46a882-4939-46d0-a421-6a1c3b777c8a",
+              "name": "replyToken",
+              "value": "={{$json.replyToken}}",
+              "type": "string"
+            },
+            {
+              "id": "8c4a2382-d53d-4029-9f19-a8d365924a90",
+              "name": "userInput",
+              "value": "={{$json.user_input}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -16
+      ],
+      "id": "815bc002-a2d7-4858-a3fa-ada82fbbd29b",
+      "name": "Save Token"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dc5edfbc-3967-4b35-894e-4b15f191b671",
+              "leftValue": "={{$json.messageType}}",
+              "rightValue": "postback",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        240
+      ],
+      "id": "2201251b-69a8-4df1-afc4-3847f880a35e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1072,
+        272
+      ],
+      "id": "a966b722-45f8-4cc7-9725-0b4efb87c64c",
+      "name": "Merge1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputJson = items[0].json; \nconst replyToken = inputJson.replyToken;\n\n// 1. 確保正確讀取 event_data 變數\nlet postbackData = inputJson.event_data; \n\n// --- 檢查：確保變數存在且非空 ---\nif (!postbackData || typeof postbackData !== 'string' || postbackData.trim() === '') {\n    // 這是上游節點（Python）的問題，如果走到這裡，表示 event_data 是空的\n    const keys = Object.keys(inputJson).join(', ');\n    return [{\n        json: {\n            replyToken: replyToken,\n            messages: [{\n                \"type\": \"text\",\n                \"text\": `【解析失敗：Postback 數據不存在】\\n收到的欄位有：${keys}\\n請確認 Python 節點是否輸出 \"event_data\"。`\n            }]\n        }\n    }];\n}\n\n// 2. 開始手動解析查詢字串 (action=value&key=value)\nlet parsedParams = {};\n\ntry {\n    // 將字串依據 '&' 分割成陣列，例如: [\"action=get_ingredients\", \"recipe_url=...\"]\n    postbackData.split('&').forEach(pair => {\n        // 將每個 pair 依據 '=' 分割成 key 和 value\n        const parts = pair.split('=');\n        if (parts.length === 2) {\n            const key = parts[0].trim();\n            // 使用 decodeURIComponent 解碼 URL 編碼的值，避免中文或特殊符號亂碼\n            const value = decodeURIComponent(parts[1].trim().replace(/\\+/g, ' '));\n            parsedParams[key] = value;\n        }\n    });\n} catch (e) {\n    return [{\n        json: {\n            replyToken: replyToken,\n            messages: [{\n                \"type\": \"text\",\n                \"text\": `【解析失敗：手動處理字串錯誤】\\n錯誤訊息：${e.message}`\n            }]\n        }\n    }];\n}\n\n\n// 3. 提取所需的變數\nconst recipeUrl = parsedParams.recipe_url;\nconst action = parsedParams.action;\n\n\n// 4. 成功輸出\nif (recipeUrl && action === 'get_ingredients') {\n    return [{\n        json: {\n            replyToken: replyToken,\n            postback_action: action,\n            recipe_url: recipeUrl // recipeUrl 已經在步驟 2 中解碼\n        }\n    }];\n} else {\n    // 如果解析出來的值不符合預期\n     return [{\n        json: {\n            replyToken: replyToken,\n            messages: [{\n                \"type\": \"text\",\n                \"text\": `【解析失敗：數據不符合預期】\\nAction: ${action}, Recipe URL: ${recipeUrl}`\n            }]\n        }\n    }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        160
+      ],
+      "id": "78db41d0-5ecd-44f6-9e31-c4882e65ad02",
+      "name": "Parse Postback Data"
+    },
+    {
+      "parameters": {
+        "content": "## 數據前置處理\n程式碼負責從Webhook的body內提取關鍵的Line事件數據。",
+        "height": 288,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        32
+      ],
+      "id": "fe5056e7-0691-4e5d-a965-6ccdfa7c7c8c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Flow 1\n### 主要功能：\n1. 接收 LINE Webhook 數據。\n\n2. 解析出 replyToken、用戶輸入 (user_input) 和 Postback 數據 (event_data)。\n\n3. 根據事件類型 (messageType) 判斷是一般訊息還是按鈕 Postback。\n\n4. 將請求分發給 flow2（處理一般訊息）或 flow3（處理 Postback 請求）。\n\n5. 最終發送 LINE 回覆訊息。",
+        "height": 336,
+        "width": 336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        32
+      ],
+      "id": "040fb07e-d859-441e-8790-a2623683ad27",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        576
+      ],
+      "id": "fa883fb2-46b0-4f96-a73b-aa613bb8f265",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XqpWAyVUctRpVqfq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_input }}",
+        "options": {
+          "systemMessage": "=你是一個食譜機器人的過濾器。請分析使用者的輸入：{{ $json.user_input }}。\n\n如果內容與「食材、料理、想吃什麼、煮飯、特定菜名」相關，請只回傳：MATCH。\n\n如果內容是打招呼、閒聊、抱怨，或是與食物完全無關，請只回傳：NOT_MATCH。\n\n規則： 嚴禁回傳任何其他解釋或標點符號，只需要 MATCH 或 NOT_MATCH。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -80,
+        400
+      ],
+      "id": "2d95ba91-a28f-419b-9133-b686b9baec4c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"抱歉，我目前只能處理食材相關的請求喔！🍎\\n\\n請輸入您想查詢的食材（例如：雞蛋、牛肉）。\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        752,
+        608
+      ],
+      "id": "21148b2e-01f7-4533-9f9e-5297c1675644",
+      "name": "HTTP Request: 導引文字"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        576,
+        608
+      ],
+      "id": "d38befeb-eb80-4ed2-8385-b77ce3bf7363",
+      "name": "Merge2",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "replyToken",
+              "value": "={{$json.replyToken}}"
+            },
+            {
+              "name": "messages",
+              "value": "={{$json.messages}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1264,
+        272
+      ],
+      "id": "99050d2a-4b9e-401d-9d2e-17575a260ed8",
+      "name": "HTTP Request - 食譜詳情"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7Tn7JU3sldkkC9kc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/7Tn7JU3sldkkC9kc",
+          "cachedResultName": "AI Recipe 烹飪小助手 flow2 for line"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        368
+      ],
+      "id": "39a261b5-721f-4565-ac38-9cfd61a6d81a",
+      "name": "Call 'AI Recipe 烹飪小助手 flow2 for line'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "oWrOXgoeMrU3yKpP",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/oWrOXgoeMrU3yKpP",
+          "cachedResultName": "AI Recipe 烹飪小助手 flow3 for line"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        160
+      ],
+      "id": "6dbad23f-eda2-4cb6-ae76-d6a3ff988262",
+      "name": "Call 'AI Recipe 烹飪小助手 flow3 for line'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "replyToken",
+              "value": "={{$json.replyToken}}"
+            },
+            {
+              "name": "messages",
+              "value": "={{$json.messages}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1264,
+        80
+      ],
+      "id": "83ad2973-b575-456f-a783-1301256cfbc9",
+      "name": "HTTP Request - Flex Message"
+    },
+    {
+      "parameters": {
+        "content": "## 完整流程\nLINE Bot\n\n   ↓ Webhook\n\nn8n Flow 1 （處理使用者訊息）\n\n   ↓ HTTP request\n\nn8n Flow 2 （食材 → 搜尋 → AI 摘要）\n\n   ↓\n\nPython API （單純負責：食譜搜尋 + 資料清洗）\n\n   ↓\n\nn8n AI Node（整理為精簡食譜）\n\n   ↓\n\n回傳 LINE（Carousel + 摘要）",
+        "height": 480,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1568,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "b459faea-43ec-4f3c-ab41-ff6ebe99c036",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## n8n Flow（流程編排 & AI 生成）\n### 負責內容：\n- Flow1：接 LINE 資料 → call Flow2 → 回傳結果\n- Flow2：呼叫 Python API → AI 整理食譜 → 回傳\n- Flow3：呼叫 Python API → 回傳食譜詳情",
+        "height": 176,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1568,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "823586b3-85bf-4cce-86ff-16f4cac7dfc7",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Call 'AI Recipe 烹飪小助手 flow2 for line'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)2": {
+      "main": [
+        [
+          {
+            "node": "Save Token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Flex Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Token": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Parse Postback Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - 食譜詳情",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Postback Data": {
+      "main": [
+        [
+          {
+            "node": "Call 'AI Recipe 烹飪小助手 flow3 for line'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request: 導引文字",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'AI Recipe 烹飪小助手 flow2 for line'": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'AI Recipe 烹飪小助手 flow3 for line'": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c18e4d42-db73-44b2-a37f-8c17f0d7e3e8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae89ce58d54326c7e3433efa7b189b787c912f34c72c635fa2bedf4aebda37fd"
+  },
+  "id": "EJnwpm5u7GflFVBo",
+  "tags": []
+}

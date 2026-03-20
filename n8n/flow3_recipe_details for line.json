@@ -1,0 +1,100 @@
+{
+  "name": "AI Recipe 烹飪小助手 flow3 for line",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "5244d45c-87c2-4256-b354-87be652423ba",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const itemsOutput = [];\nconst inputItem = items[0].json;\n\n// 1. 從上游節點（HTTP Request1）獲取 API 返回的完整食譜數據\n// 修正：targetRecipe 就是 inputItem 本身\nconst targetRecipe = inputItem; \n\n// 2. 確保 replyToken 存在\nconst replyToken = targetRecipe.replyToken; \n\n\n// 3. 檢查 API 是否返回有效的食譜數據（例如，檢查 title 欄位）\nif (targetRecipe && targetRecipe.title) {\n    // 4. 格式化文本內容\n    const recipeTitle = targetRecipe.title.trim();\n    // 修正：LINE Message 不支援 Markdown 的 **，我們使用換行來強調\n    let textMessage = `🍲 ${recipeTitle} 完整詳情 🍲\\n\\n`;\n    textMessage += \"--- 🍳 材料清單 ---\\n\";\n    \n    // 使用原始材料字串\n    textMessage += `${targetRecipe.ingredients_raw || \"未提供材料清單\"}\\n\\n`;\n    \n    textMessage += \"--- 📜 烹飪步驟 ---\\n\";\n    \n    // 修正：使用正確的陣列處理邏輯 (steps_raw 是 [ { description: \"...\" }, ... ] )\n    if (targetRecipe.steps_raw && Array.isArray(targetRecipe.steps_raw) && targetRecipe.steps_raw.length > 0) {\n        textMessage += targetRecipe.steps_raw.map((step, index) => \n            // 使用 .trim() 移除描述前後的空格\n            `步驟 ${index + 1}: ${step.description.trim()}` \n        ).join('\\n');\n    } else {\n        textMessage += \"未提供詳細步驟。\\n\";\n    }\n\n    // 5. 生成 LINE Text Message 結構\n    // 注意：LINE Message 文本長度限制為 2000 個字符，如果超過可能也會導致 Bad Request\n    const lineMessages = [\n        {\n            \"type\": \"text\",\n            \"text\": textMessage\n        }\n    ];\n\n    // 6. 返回給下游節點的 Item (包含 messages 和 replyToken)\n    itemsOutput.push({ \n        json: { \n            \"messages\": lineMessages,\n            \"replyToken\": replyToken \n        } \n    });\n} else {\n    // 找不到食譜時的錯誤回覆\n    itemsOutput.push({ \n        json: {\n            \"messages\": [{ \"type\": \"text\", \"text\": `抱歉，找不到您查詢的食譜詳情。` }],\n            \"replyToken\": replyToken\n        } \n    });\n}\n\nreturn itemsOutput;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "d92b5359-db4a-47b6-89d5-92cce647749a",
+      "name": "Code: Format Recipe Details"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://recipe-ai-kusq.onrender.com/recipe_details",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipe_url\": \"{{ $json.recipe_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        0
+      ],
+      "id": "3cf96ec8-8c7f-4de5-8f81-c5709f481456",
+      "name": "HTTP Request (API 2 - POST /recipe_details)"
+    },
+    {
+      "parameters": {
+        "content": "## Flow 3\n獲取食譜詳情：依據解析出的資料，向API 請求該食譜的完整步驟、詳細食材清單及烹飪技巧。",
+        "height": 144
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "fd114a8a-6ebd-4044-813b-d270fe6efbb3",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (API 2 - POST /recipe_details)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (API 2 - POST /recipe_details)": {
+      "main": [
+        [
+          {
+            "node": "Code: Format Recipe Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "3c0cc8a8-ce1b-4960-afd0-f6fb536e7ae6",
+  "meta": {
+    "instanceId": "ae89ce58d54326c7e3433efa7b189b787c912f34c72c635fa2bedf4aebda37fd"
+  },
+  "id": "oWrOXgoeMrU3yKpP",
+  "tags": []
+}

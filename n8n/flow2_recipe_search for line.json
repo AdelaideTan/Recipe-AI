@@ -1,0 +1,338 @@
+{
+  "name": "AI Recipe 烹飪小助手 flow2 for line",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        224
+      ],
+      "id": "2de4b0ae-f994-4acf-acb8-22771789ab34",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "content": "### 被 flow 1 trigger",
+        "height": 240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "bb9506ed-7e27-4e5e-8b96-c2b4deeb1ad8",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "jsCode": "// *** 1. 解析輸入資料 ***\n// 假設 Aggregate 節點的輸出結構是：\n// items[0].json.data (包含所有經 Merge 節點合併後的食譜陣列)\n\n// 修正：mergedRecipeData 包含 AI 摘要結果 (在 .output 內) 和原始食譜資料 (例如：original_url)\nconst mergedRecipeData = items[0].json.data;\n\n// *** 刪除手動定義的 mockMetadata (已不再需要) ***\n// const mockMetadata = [ ... ]; // 請確保您已經刪除原程式碼中的 mockMetadata 定義\n\nconst carouselColumns = [];\nconst maxRecipes = Math.min(mergedRecipeData.length, 10);\n\n// *** 2. 數據迭代與模板填充 ***\nfor (let i = 0; i < maxRecipes; i++) {\n  // 從合併後的數據中直接提取所有必要的欄位\n  const recipe = mergedRecipeData[i];\n  \n  // 由於 Merge 節點是以 Replace 模式合併，AI 摘要結果通常會保留在 .output 欄位中\n  const aiOutput = recipe.output; \n  \n  // 原始連結和圖片直接從 recipe 物件中獲取\n  const original_url = recipe.original_url || ''; \n  const original_title = recipe.original_title || (aiOutput ? aiOutput.ai_title : '未知食譜'); \n\n  // **【關鍵修正】：檢查圖片 URL 是否為 Base64，如果是則替換為有效 HTTPS 網址**\n  let image_url = recipe.image_url;\n  const default_image = 'https://fakeimg.pl/400x400/CCCCCC/000000?text=No+Image';\n\n  if (!image_url || image_url.startsWith('data:')) {\n    // 如果圖片不存在，或是 Base64 (以 \"data:\" 開頭)，則使用預設圖片\n    image_url = default_image;\n  }\n  // 否則，保持原本的 image_url (必須假設它是有效的 HTTPS 網址)\n  \n  // 確保 AI 摘要欄位存在\n  const ai_title = aiOutput ? aiOutput.ai_title : '食譜標題缺失';\n  const ai_summary = aiOutput ? aiOutput.ai_summary : '食譜摘要缺失';\n\n  const column = {\n    \"thumbnailImageUrl\": image_url, \n    // LINE Carousel 模板允許 Image Background Color\n    \"imageBackgroundColor\": \"#FFFFFF\", \n    \"title\": ai_title, \n    \"text\": ai_summary,\n    \n    // 設定預設動作，點擊圖片區域時觸發\n    \"defaultAction\": {\n      \"type\": \"uri\",\n      \"label\": \"查看詳情\",\n      \"uri\": original_url // <--- 使用真實連結\n    },\n    \n    // 設定底部的動作按鈕\n    \"actions\": [\n      {\n        \"type\": \"uri\",\n        \"label\": \"查看完整食譜 (原網址)\",\n        \"uri\": original_url // <--- 使用真實連結\n      },\n      // Message Action：觸發後續的 Bot 流程 (詢問材料清單)\n      {\n       \"type\": \"postback\",\n        \"label\": \"查詢完整材料清單\", // 簡潔的按鈕文字\n        \n        // *** 這是核心修改點：將 URL 嵌入 data 欄位 ***\n        // 格式：action=指令&recipe_url=完整URL\n        \"data\": `action=get_ingredients&recipe_url=${encodeURIComponent(recipe.original_url)}`,\n        \n        // (選用) 點擊後在聊天室顯示的文字，讓使用者知道發生了什麼事\n        \"displayText\": `正在查詢 ${aiOutput.ai_title} 的材料清單...` // <--- 使用真實標題\n      }\n    ]\n  };\n  \n  carouselColumns.push(column);\n}\n\n// ... (程式碼後半段不變)\n\n// 移除原有的 lineResponse 結構，直接輸出 messages 陣列\nconst lineMessages = [\n  {\n    \"type\": \"template\",\n    \"altText\": `AI為您精選了 ${maxRecipes} 個食譜！請點擊查看詳情。`, \n    \"template\": {\n      \"type\": \"carousel\",\n      \"columns\": carouselColumns\n    }\n  }\n];\n// ... (您的 lineMessages 陣列定義，包含所有 LINE 訊息)\n\n// 創建一個包含 'messages' 屬性的物件\nconst outputObject = {\n    messages: lineMessages\n};\n\n// 讓 Code 節點返回這個物件\nreturn [{ json: outputObject }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        240
+      ],
+      "id": "a24d2410-77e8-4941-a65f-314bbfec847b",
+      "name": "轉換 LINE Carousel 模板1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        432
+      ],
+      "id": "7d6ce8ac-87da-4bfd-a33b-05d98823163b"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"ai_title\": \"精選標題\", \n  \"ai_summary\": \"精選摘要\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2224,
+        528
+      ],
+      "id": "5a71db16-4197-447c-857c-d7f611f4afba",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1744,
+        368
+      ],
+      "id": "d131d116-34e5-4277-a721-559d2c688183",
+      "name": "逐個食譜分開處理"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        240
+      ],
+      "id": "4b04e850-1ece-4c5f-a63f-e17b811b5fb6",
+      "name": "輸出前合併"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你是一位專業食譜編輯。任務是根據以下原始食譜資料，產生一個符合 LINE Carousel 格式要求的簡短摘要。\n\n原始食譜標題：{{$json.title}}\n原始食譜材料：{{$json.ingredients_raw}}\n原始食譜步驟：{{$json.steps_raw}}\n\n請嚴格依照以下 JSON 格式輸出，並遵守字數限制：\n1. \"ai_title\": 必須是吸引人的短標題，不超過 40 個字符。\n2. \"ai_summary\": 請簡述主要食材、關鍵步驟，並提供「一個烹飪秘訣」，總共不超過 60 個字符。\n\n{\n  \"ai_title\": \"精選標題\", \n  \"ai_summary\": \"精選摘要\"\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        352
+      ],
+      "id": "d584cc2d-c944-43fa-b76f-8a3575942ad9",
+      "name": "AI 食譜摘要"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "recipes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        224
+      ],
+      "id": "0ec3de15-5064-4aee-8ec8-a6345af837ad",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2368,
+        240
+      ],
+      "id": "31628b1b-de2d-4499-bbf9-3465cdf9e587",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "https://recipe-ai-kusq.onrender.com/recipes",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{$json[\"user_input\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "63a735e8-1720-411a-a1f4-90b3205f2e42",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        528
+      ],
+      "id": "14ab9c04-b409-441f-83f4-8a79238ee982",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "XqpWAyVUctRpVqfq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Flow 2\n### 主要功能：\n1. 被 Flow 1 觸發：接收來自主要工作流（Flow 1）分發的一般訊息請求。\n\n2. 食譜數據抓取：透過 HTTP Request 節點向食譜 API 發送請求，獲取原始食譜資料。\n\n3. 數據拆分與處理：使用 Split Out 節點將獲取的多筆食譜資料拆分成單一項目，並透過循環（Loop）機制逐個進行細節處理。\n\n4. AI 食譜摘要：運用 AI 結合結構化輸出解析器（Structured Output Parser），將原始網頁內容轉化為精簡的食譜摘要\n\n格式轉換與合併：將 AI 處理後的資訊重新合併，並透過程式碼節點轉化為 LINE 的 Carousel（輪播介面）模板格式，以便在 LINE 上美觀地呈現多筆食譜。",
+        "height": 448,
+        "width": 336
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        64
+      ],
+      "id": "3a432d4c-4311-491e-92a5-e1c0227cc4b6",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "逐個食譜分開處理",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI 食譜摘要",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "逐個食譜分開處理": {
+      "main": [
+        [
+          {
+            "node": "AI 食譜摘要",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "輸出前合併": {
+      "main": [
+        [
+          {
+            "node": "轉換 LINE Carousel 模板1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI 食譜摘要": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "逐個食譜分開處理",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "輸出前合併",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI 食譜摘要",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "97d06623-bac8-4078-a460-c86de0c1127d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae89ce58d54326c7e3433efa7b189b787c912f34c72c635fa2bedf4aebda37fd"
+  },
+  "id": "7Tn7JU3sldkkC9kc",
+  "tags": []
+}
