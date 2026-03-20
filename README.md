@@ -28,19 +28,23 @@ source venv/bin/activate
 
 # 安裝套件
 pip install -r requirements.txt
+```
 
 ### 2. 設定環境變數
 在根目錄建立 .env 檔案，並填入以下資訊：
-
+```bash
 LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_Token
 LINE_CHANNEL_SECRET=你的_LINE_Secret
 GEMINI_API_KEY=你的_Gemini_Key
 PORT=8000
+```
 
 ### 3. 啟動服務
+```bash
 python main.py
+```
 
-🌐 部署至 Render 說明
+## 🌐 部署至 Render 說明
 本專案專為 Render 最佳化，部署時請注意以下設定：
 
 Build Command: pip install -r requirements.txt
