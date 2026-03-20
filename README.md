@@ -15,7 +15,17 @@
 - **Integration**: n8n (Workflow Automation)
 - **Deployment**: Render (Web Service)
 
-## 🚀 快速開始 (在地端開發)
+## 📂 專案結構
+```bash
+.
+├── main.py              # FastAPI 主程式 & LINE Webhook 進入點
+├── scraper.py           # iCook 食譜爬蟲邏輯
+├── parser.py            # AI 格式轉換與文字處理
+├── requirements.txt     # 專案依賴清單
+└── .env                 # 環境變數 (不要上傳到 GitHub!)
+```
+
+## 🚀 快速開始 (地端開發)
 
 ### 1. 複製專案與安裝環境
 ```bash
@@ -36,25 +46,17 @@ pip install -r requirements.txt
 LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_Token
 LINE_CHANNEL_SECRET=你的_LINE_Secret
 GEMINI_API_KEY=你的_Gemini_Key
-PORT=8000
 ```
 
-### 3. 啟動服務
+## 🌐 部署說明 (Render)
 ```bash
-python main.py
-```
+1. Build Command: pip install -r requirements.txt
 
-## 🌐 部署至 Render 說明
-本專案專為 Render 最佳化，部署時請注意以下設定：
-
-Build Command: pip install -r requirements.txt
-
-Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
+2. Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
 Environment Variables:
-請務必在 Render Dashboard 的 Environment 區塊手動新增 .env 檔案中的所有 Key-Value 對，切勿將 .env 上傳至 GitHub。
-
-Health Check: 本專案提供 /health 端點，可用於監控服務狀態。
+務必在 Render Dashboard 手動新增上述三個 API Keys。
+```
 
 ## 📝 API 說明
 GET /recipes?q={食材}: 初次搜尋並將完整食譜存入快取。
@@ -62,3 +64,8 @@ GET /recipes?q={食材}: 初次搜尋並將完整食譜存入快取。
 POST /recipe_details: 根據食譜 URL 從快取提取詳細步驟。
 
 GET /health: 健康檢查與快取狀態監測。
+
+## 📝 備註
+本專案僅供技術練習與個人使用，請尊重 iCook 之服務條款。
+
+如有任何問題，歡迎聯絡開發者：Adelaide Tan
