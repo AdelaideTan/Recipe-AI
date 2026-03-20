@@ -2,14 +2,22 @@
 # LINE BOT 專案的核心後端 API，它使用 FastAPI 框架，扮演了食譜爬蟲、資料清洗，
 # 以及最重要的——短期記憶體 (快取) 的角色
 # 以下主要實現了兩大功能：first time search-食譜搜尋 和 sec time search-食譜詳情查詢 (快取機制)
+import os
+import time
+import json
+import uvicorn
+from dotenv import load_dotenv
+
+# 1. 優先讀取環境變數
+load_dotenv()
+
+LINE_TOKEN = os.getenv("LINE_CHANNEL_ACCESS_TOKEN")
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
 from fastapi import FastAPI, Response, HTTPException    # 引入 FastAPI 核心、回應處理和錯誤處理模組
 from fastapi.encoders import jsonable_encoder           # 引入將 Python 物件轉為 JSON 格式的工具
 from pydantic import BaseModel                          # 引入 Pydantic 用於定義資料結構 (驗證 POST 輸入)
-import json
-import os
-import uvicorn
-import time 
+
 
 from scraper import search_recipes, fetch_steps  # 確保 scraper 有匯出 fetch_steps      # 引入爬蟲模組（負責抓取資料）
 from parser import clean_recipe                                                       # 引入資料清洗模組（負責標準化結構）
