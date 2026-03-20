@@ -264,7 +264,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
             }
           ]
         },
@@ -307,7 +307,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
             }
           ]
         },
@@ -400,7 +400,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer wZkI44jy5jy4Ign2RHbBy5/bv4r+Occ7k/TQ1X0eh9uiYrH2H8LrYGOpHhjbK3Y6DWyfza62nAVIGEZO0kjmRB3zsXbQdYSYG7P4AHVks1ikU0v/C1UtGW57p7+w6B55xviyZK+SsLtg+SbFEteH3gdB04t89/1O/w1cDnyilFU="
+              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
             }
           ]
         },
