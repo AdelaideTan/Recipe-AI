@@ -22,7 +22,7 @@
 ├── scraper.py           # iCook 食譜爬蟲邏輯
 ├── parser.py            # AI 格式轉換與文字處理
 ├── requirements.txt     # 專案依賴清單
-└── .env                 # 環境變數 (不要上傳到 GitHub!)
+└── .env                 # 環境變數
 ```
 
 ## 🚀 快速開始 (地端開發)
