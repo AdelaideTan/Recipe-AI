@@ -61,29 +61,28 @@ Environment Variables:
 
 ### 1. 匯入工作流檔案 (Import JSON)
 本專案的 n8n/ 資料夾中包含三個關鍵的 .json 檔案。請依序在你的 n8n 平台中點擊 「Import from File」 並開啟它們：
-
+```bash
 flow1_entry for line.json: 負責接收 LINE 訊息並轉發給 FastAPI。
 
 flow2_recipe_search for line.json: 負責處理 FastAPI 回傳的食譜資料並進行 AI 食譜摘要。
 
 flow3_recipe_details for line.json: 負責從 FastAPI 獲取食譜詳情。
+```
 
 ### 2. 修改節點設定 (Node Configuration)
 匯入後，請務必針對以下節點進行手動調整：
-
+```bash
 Flow 1 - LINE 回傳 HTTP Request 節點:
-
 請在 Credentials 中填入你的 LINE_CHANNEL_ACCESS_TOKEN。
 
 Flow 2 & 3 - HTTP Request 節點:
-
 將網址修改為你部署在 Render 的實際網址：
 https://<你的-Render-專案名稱>.onrender.com/recipes
 
 Flow 1 & 2 - AI Agent / Google Gemini 節點：
-
 API Key: 請換成你自己的 GEMINI_API_KEY（可從 Google AI Studio 取得）。
 Model: 免費版可選取 gemini-1.5-flash。
+```
 
 ## 📝 API 說明
 GET /recipes?q={食材}: 初次搜尋並將完整食譜存入快取。
