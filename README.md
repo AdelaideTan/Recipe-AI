@@ -103,7 +103,7 @@ GET /health: 健康檢查與快取狀態監測。
 
 以下是 **AI Recipe 烹飪小助手** 在 LINE 上的實際運作畫面：
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/e4b9c7cb-1eea-4f2c-97cb-7c05508541a7" width="80%" alt="demo image">
+  <img src="https://github.com/user-attachments/assets/e4b9c7cb-1eea-4f2c-97cb-7c05508541a7" width="90%" alt="demo image">
 
 </p>
 
