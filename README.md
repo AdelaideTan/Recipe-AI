@@ -88,8 +88,6 @@ Flow 2 & 3 - HTTP Request 節點:
 Flow 1 & 2 - AI Agent / Google Gemini 節點：
 ```bash
 API Key: 請換成你自己的 GEMINI_API_KEY（可從 Google AI Studio 取得）。
-
-Model: 免費版可選取 gemini-1.5-flash。
 ```
 
 ## 📝 API 說明
