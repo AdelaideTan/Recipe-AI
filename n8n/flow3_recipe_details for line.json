@@ -30,7 +30,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://recipe-ai-kusq.onrender.com/recipe_details",
+        "url": "{{YOUR_RENDER_URL}}/recipe_details",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"recipe_url\": \"{{ $json.recipe_url }}\"\n}",

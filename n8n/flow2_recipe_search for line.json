@@ -141,7 +141,7 @@
     },
     {
       "parameters": {
-        "url": "https://recipe-ai-kusq.onrender.com/recipes",
+        "url": "{{YOUR_RENDER_URL}}/recipes",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [

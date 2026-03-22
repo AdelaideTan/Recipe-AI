@@ -71,16 +71,24 @@ flow3_recipe_details for line.json: 負責從 FastAPI 獲取食譜詳情。
 
 ### 2. 修改節點設定 (Node Configuration)
 匯入後，請務必針對以下節點進行手動調整：
-```bash
+
 Flow 1 - LINE 回傳 HTTP Request 節點:
-請在 Credentials 中填入你的 LINE_CHANNEL_ACCESS_TOKEN。
+```bash
+找到 Headers 區塊，在 Authorization 的 Value 欄位中，將 Bearer 後方的亂碼替換為你自己的 LINE Channel Access Token。
+
+格式注意：必須保留 Bearer 字樣及一個空格（例如：Bearer YOUR_TOKEN_HERE）。
+```
 
 Flow 2 & 3 - HTTP Request 節點:
+```bash
 將網址修改為你部署在 Render 的實際網址：
 https://<你的-Render-專案名稱>.onrender.com/recipes
+```
 
 Flow 1 & 2 - AI Agent / Google Gemini 節點：
+```bash
 API Key: 請換成你自己的 GEMINI_API_KEY（可從 Google AI Studio 取得）。
+
 Model: 免費版可選取 gemini-1.5-flash。
 ```
 
