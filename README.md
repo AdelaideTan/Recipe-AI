@@ -43,7 +43,9 @@ pip install -r requirements.txt
 在根目錄建立 .env 檔案，並填入以下資訊：
 ```bash
 LINE_CHANNEL_ACCESS_TOKEN=你的_LINE_Token
+
 LINE_CHANNEL_SECRET=你的_LINE_Secret
+
 GEMINI_API_KEY=你的_Gemini_Key
 ```
 
@@ -53,8 +55,7 @@ GEMINI_API_KEY=你的_Gemini_Key
 
 2. Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 
-Environment Variables:
-務必在 Render Dashboard 手動新增上述三個 API Keys。
+3. Environment Variables: 務必在 Render Dashboard 手動新增上述三個 API Keys。
 ```
 ## 🔄 n8n 工作流配置 (Workflow Setup)
 本專案的核心自動化邏輯由 n8n 驅動。在開始設定前，請先完成以下步驟：
@@ -81,8 +82,7 @@ Flow 1 - LINE 回傳 HTTP Request 節點:
 
 Flow 2 & 3 - HTTP Request 節點:
 ```bash
-將網址修改為你部署在 Render 的實際網址：
-https://<你的-Render-專案名稱>.onrender.com/recipes
+將網址修改為你部署在 Render 的實際網址：https://<你的-Render-專案名稱>.onrender.com/recipes
 ```
 
 Flow 1 & 2 - AI Agent / Google Gemini 節點：
