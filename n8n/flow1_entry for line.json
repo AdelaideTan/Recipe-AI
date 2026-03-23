@@ -1,5 +1,5 @@
 {
-  "name": "AI Recipe 烹飪小助手 Flow 1 for line",
+  "name": "AI Recipe 烹飪小助手 flow 1 for line",
   "nodes": [
     {
       "parameters": {
@@ -13,7 +13,7 @@
           "conditions": [
             {
               "id": "aed513e4-2f8e-4ff8-b254-dbfa1f127a4d",
-              "leftValue": "={{ $json.output }}",
+              "leftValue": "={{ $json.output.status }}",
               "rightValue": "MATCH",
               "operator": {
                 "type": "string",
@@ -220,13 +220,12 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-2.0-flash",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -80,
+        -96,
         576
       ],
       "id": "fa883fb2-46b0-4f96-a73b-aa613bb8f265",
@@ -242,8 +241,9 @@
       "parameters": {
         "promptType": "define",
         "text": "={{ $json.user_input }}",
+        "hasOutputParser": true,
         "options": {
-          "systemMessage": "=你是一個食譜機器人的過濾器。請分析使用者的輸入：{{ $json.user_input }}。\n\n如果內容與「食材、料理、想吃什麼、煮飯、特定菜名」相關，請只回傳：MATCH。\n\n如果內容是打招呼、閒聊、抱怨，或是與食物完全無關，請只回傳：NOT_MATCH。\n\n規則： 嚴禁回傳任何其他解釋或標點符號，只需要 MATCH 或 NOT_MATCH。"
+          "systemMessage": "=你是一個食譜機器人的過濾器。請分析使用者的輸入：{{ $json.user_input }}。\n\n請務必以 JSON 格式回傳以下內容：\n\nstatus: 如果內容與「食材、料理、想吃什麼、煮飯、特定菜名」相關，值為 MATCH；否則為 NOT_MATCH。\n\ningredient: 請提取出使用者提到的「食材」或「菜名」。如果是 NOT_MATCH，此欄位留空。\n\n規則： 嚴禁回傳任何 JSON 以外的解釋文字。\n\n範例輸出：\n{\"status\": \"MATCH\", \"ingredient\": \"雞蛋\"}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -253,7 +253,8 @@
         400
       ],
       "id": "2d95ba91-a28f-419b-9133-b686b9baec4c",
-      "name": "AI Agent"
+      "name": "AI Agent",
+      "alwaysOutputData": false
     },
     {
       "parameters": {
@@ -264,7 +265,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
+              "value": "Bearer "YOUR LINE ACCESSTOKEN""
             }
           ]
         },
@@ -307,7 +308,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
+              "value": "Bearer "YOUR LINE ACCESSTOKEN""
             }
           ]
         },
@@ -339,38 +340,10 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "7Tn7JU3sldkkC9kc",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/7Tn7JU3sldkkC9kc",
-          "cachedResultName": "AI Recipe 烹飪小助手 flow2 for line"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        576,
-        368
-      ],
-      "id": "39a261b5-721f-4565-ac38-9cfd61a6d81a",
-      "name": "Call 'AI Recipe 烹飪小助手 flow2 for line'"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
           "value": "oWrOXgoeMrU3yKpP",
           "mode": "list",
           "cachedResultUrl": "/workflow/oWrOXgoeMrU3yKpP",
-          "cachedResultName": "AI Recipe 烹飪小助手 flow3 for line"
+          "cachedResultName": "AI Recipe 烹飪小助手 flow 3 for line"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -400,7 +373,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer "YOUR_LINE_TOKEN_HERE""
+              "value": "Bearer "YOUR LINE ACCESSTOKEN""
             }
           ]
         },
@@ -457,6 +430,47 @@
       "typeVersion": 1,
       "id": "823586b3-85bf-4cce-86ff-16f4cac7dfc7",
       "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7Tn7JU3sldkkC9kc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/7Tn7JU3sldkkC9kc",
+          "cachedResultName": "AI Recipe 烹飪小助手 flow 2 for line"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        368
+      ],
+      "id": "39a261b5-721f-4565-ac38-9cfd61a6d81a",
+      "name": "Call 'AI Recipe 烹飪小助手 flow 2 for line'"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"status\": \"MATCH\",\n  \"ingredient\": \"牛肉\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        576
+      ],
+      "id": "78cc9b19-4094-4b13-aa3a-bc157292051c",
+      "name": "Structured Output Parser"
     }
   ],
   "pinData": {},
@@ -465,7 +479,7 @@
       "main": [
         [
           {
-            "node": "Call 'AI Recipe 烹飪小助手 flow2 for line'",
+            "node": "Call 'AI Recipe 烹飪小助手 flow 2 for line'",
             "type": "main",
             "index": 0
           }
@@ -611,7 +625,18 @@
         ]
       ]
     },
-    "Call 'AI Recipe 烹飪小助手 flow2 for line'": {
+    "Call 'AI Recipe 烹飪小助手 flow3 for line'": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Call 'AI Recipe 烹飪小助手 flow 2 for line'": {
       "main": [
         [
           {
@@ -622,13 +647,13 @@
         ]
       ]
     },
-    "Call 'AI Recipe 烹飪小助手 flow3 for line'": {
-      "main": [
+    "Structured Output Parser": {
+      "ai_outputParser": [
         [
           {
-            "node": "Merge1",
-            "type": "main",
-            "index": 1
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
           }
         ]
       ]
@@ -640,7 +665,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "c18e4d42-db73-44b2-a37f-8c17f0d7e3e8",
+  "versionId": "5fb9c72c-2344-4f8a-85c9-62cbda9def24",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ae89ce58d54326c7e3433efa7b189b787c912f34c72c635fa2bedf4aebda37fd"
