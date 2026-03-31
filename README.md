@@ -1,18 +1,19 @@
 # 🍳 AI Recipe 烹飪小助手(n8n)
 
-這是一個結合了 **FastAPI**、**BeautifulSoup4** 與 **n8n** 的智慧食譜搜尋系統。使用者只需在 LINE 輸入食材，系統便會自動從 iCook 爬取食譜、進行資料清洗，並透過 AI 整理出最易讀的烹飪步驟。
+這是一個結合了 **FastAPI**、**BeautifulSoup4**、 **n8n** 與 **LineBot** 的智慧食譜搜尋系統。使用者只需在 LINE 輸入食材，系統便會自動從食譜網站爬取食譜、進行資料清洗，並透過 AI 整理出最易讀的烹飪步驟。
 
 ## ✨ 核心功能
-- **智慧爬蟲**：自動解析 iCook 網頁，支援 `srcset` 懶載入圖片抓取。
-- **高效快取 (In-Memory Cache)**：實作 TTL 快取機制，大幅提升第二次查詢（食譜詳情）的反應速度。
-- **資料標準化**：將雜亂的網頁 HTML 轉換為乾淨的 JSON 結構。
+- **網頁爬蟲**：自動解析食譜網頁（e.g. iCook ），支援 `srcset` 懶載入圖片抓取。
+- **AI 食譜摘要**: : AI 自動摘要原始食譜並生成 “AI 吸睛標題” 以及 “精選食譜摘要”。
+- **雲端部署**：整合 n8n 與 Render 雲端平台，建構端到端的自動化 CI/CD 工作流。
+- **User Interface**：生成1-3個 line flex message 的食譜供使用者挑選。
 
 ## 🛠️ 技術棧
 - **Language**: Python 3.9+
 - **Framework**: FastAPI (Uvicorn)
 - **Scraping**: BeautifulSoup4, Requests
 - **Integration**: n8n (Workflow Automation)
-- **Deployment**: Render
+- **Deployment**: Render (Cloud Hosting)
 
 ## 📂 專案結構
 ```bash
