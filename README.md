@@ -12,7 +12,7 @@
 - **Framework**: FastAPI (Uvicorn)
 - **Scraping**: BeautifulSoup4, Requests
 - **Integration**: n8n (Workflow Automation)
-- **Deployment**: Render (Web Service)
+- **Deployment**: Render
 
 ## 📂 專案結構
 ```bash
