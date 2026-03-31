@@ -109,7 +109,7 @@ GET /health: 健康檢查與快取狀態監測。
 ## 🛠️ 專案架構圖 (Architecture Diagram)
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/9cf9039c-7a26-44d0-ad63-47bb2719b125" width="100%" alt="AI Recipe AI 烹飪小助手架構流程圖">
+  <img src="https://github.com/user-attachments/assets/24c3a665-1235-4a2f-82b8-0254b5016aac" width="100%" alt="AI Recipe AI 烹飪小助手架構流程圖">
 </p>
 
 ## 📝 備註
