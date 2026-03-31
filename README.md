@@ -105,6 +105,12 @@ GET /health: 健康檢查與快取狀態監測。
 
 </p>
 
+## 🛠️ 專案架構圖 (Architecture Diagram)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0b36fbc3-e8ec-4045-aaa0-7467e250a51b" width="100%" alt="AI Recipe AI 烹飪小助手架構流程圖">
+</p>
+
 ## 📝 備註
 本專案僅供技術練習與個人使用，請尊重 iCook 之服務條款。
 
